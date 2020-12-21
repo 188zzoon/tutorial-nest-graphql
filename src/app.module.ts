@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from "@nestjs/graphql";
-import { ResturantsModule } from './resturants/resturants.module';
+import { RestaurantsModule } from './restaurants/restaurants.module';
 
 @Module({
   imports: [
-    ResturantsModule,
+    RestaurantsModule,
     GraphQLModule.forRoot({
       autoSchemaFile: true
     }), 
