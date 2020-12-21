@@ -1,7 +1,8 @@
 import { Field, ObjectType } from "@nestjs/graphql";
-import { Column, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity ,PrimaryGeneratedColumn } from "typeorm";
 
 @ObjectType()
+@Entity()
 export class Restaurant {
 
     @PrimaryGeneratedColumn()
