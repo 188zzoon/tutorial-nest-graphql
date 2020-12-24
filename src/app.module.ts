@@ -4,8 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
-import { UserModule } from './user/user.module';
-import { User } from "./user/entities/user.entity";
+import { UserModule } from './users/users.module';
+import { User } from "./users/entities/users.entity";
 
 @Module({
   imports: [
