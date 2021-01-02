@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
 import { UserModule } from './users/users.module';
 import { User } from "./users/entities/user.entity";
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { User } from "./users/entities/user.entity";
     // RestaurantsModule,
     CommonModule,
     UserModule,
+    JwtModule,
   ],
   controllers: [],
   providers: [],
