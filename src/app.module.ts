@@ -41,10 +41,10 @@ import { JwtModule } from './jwt/jwt.module';
     GraphQLModule.forRoot({
       autoSchemaFile: true,
     }),
-    // RestaurantsModule,
+    JwtModule.forRoot(),
     CommonModule,
     UserModule,
-    JwtModule,
+    // RestaurantsModule,
   ],
   controllers: [],
   providers: [],
