@@ -5,9 +5,9 @@ import * as  jwt from 'jsonwebtoken'
 import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput } from './dtos/login.dto';
 import { User } from "./entities/user.entity";
-import { ConfigService } from "@nestjs/config";
 import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput } from './dtos/edit-profile.dto';
+import { Verification } from "./entities/verification.entity";
 
 
 // @Injectable()
@@ -22,7 +22,7 @@ import { EditProfileInput } from './dtos/edit-profile.dto';
 export class UserService {
     constructor(
         @InjectRepository(User) private readonly users: Repository<User>,
-        private readonly config: ConfigService,
+        @InjectRepository(Verification) private readonly verifications: Repository<Verification>,
         private readonly jwtService: JwtService
         ){}
     
@@ -35,8 +35,8 @@ export class UserService {
                     error : 'There is a user with that email already'
                 }
             }
-
-            await this.users.save(this.users.create({email,password,role}))
+            const user =  await this.verifications.save(this.users.create({email,password,role}));
+            await this.verifications.save(this.verifications.create({user}))
         } catch (e) {
             return {
                 ok: false,
@@ -92,6 +92,8 @@ export class UserService {
         const user = await this.users.findOne(userId)
         if (email) {
             user.email = email
+            user.verified = false
+            await this.verifications.save(this.verifications.create({user}))
         }
         if (password) {
             user.password = password
