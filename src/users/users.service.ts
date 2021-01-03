@@ -26,7 +26,7 @@ export class UserService {
         private readonly jwtService: JwtService
         ){}
     
-    async createAccount({email, password, role}: CreateAccountInput) : Promise<{ok: boolean, error: string}> {
+    async createAccount({email, password, role}: CreateAccountInput) : Promise<{ok: boolean, error?: string}> {
         try {
             const exists = await this.users.findOne({email})
             if(exists) {
@@ -35,8 +35,13 @@ export class UserService {
                     error : 'There is a user with that email already'
                 }
             }
-            const user =  await this.verifications.save(this.users.create({email,password,role}));
+            const user =  await this.users.save(this.users.create({email,password,role}));
+            console.log(user)
+            // const very = await this.verifications.create({user})
+            // console.log(very)
             await this.verifications.save(this.verifications.create({user}))
+            console.log("Done")
+            return {ok: true}
         } catch (e) {
             return {
                 ok: false,

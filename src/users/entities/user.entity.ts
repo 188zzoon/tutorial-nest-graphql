@@ -16,12 +16,12 @@ import { IsEmail, IsEnum } from 'class-validator';
     Delivery,
   }
   
-  registerEnumType(UserRole, { name: 'UserRole' });
-  
-  @InputType({ isAbstract: true })
-  @ObjectType()
-  @Entity()
-  export class User extends CoreEntity {
+registerEnumType(UserRole, { name: 'UserRole' });
+
+@InputType({ isAbstract: true })
+@ObjectType()
+@Entity()
+export class User extends CoreEntity {
     @Column()
     @Field(type => String)
     @IsEmail()
@@ -38,7 +38,7 @@ import { IsEmail, IsEnum } from 'class-validator';
 
     @Column({default: false})
     @Field(type => Boolean)
-    verified: boolean
+    verified: boolean;
   
   @BeforeInsert()
   @BeforeUpdate()
