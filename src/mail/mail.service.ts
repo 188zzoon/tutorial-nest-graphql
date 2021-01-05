@@ -18,12 +18,17 @@ export class MailService{
         form.append('to', `zzoon.dev@gmail.com`)
         form.append('subject', subject)
         form.append('text', content)
+        form.append('template', 'verify-email');
+        form.append('v:code', 'asasas');
+        form.append('v:username', 'nico!!!');
+
+
         const response = await got(
             `https://api.mailgun.net/v3/${this.options.domain}/messages`,
             {
                 method: 'POST',
                 headers: {
-                    Authrization: `Basic ${Buffer.from(`api:${this.options.apiKey}`,).toString('base64')}`,
+                    Authorization: `Basic ${Buffer.from(`api:${this.options.apiKey}`,).toString('base64')}`,
                 },
                 // body: JSON.stringify({
                 //     from: this.options.fromEmail,
