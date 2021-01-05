@@ -6,7 +6,8 @@ import { User } from "./entities/user.entity";
 import { Verification } from "./entities/verification.entity";
 import { UserService } from "./users.service";
 import { Repository } from "typeorm";
-import { UsersResolver } from "./users.resolver";
+import { setFlagsFromString } from "v8";
+import { exception } from "console";
 
 type mockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>
 
@@ -17,14 +18,14 @@ const mockRepository = () => ({
     findOneOrFail: jest.fn()
 });
 
-const mockJwtService = {
+const mockJwtService = () => ({
     sign: jest.fn(() => 'signed-token-babay'),
     verify: jest.fn(),
-}
+})
 
-const mockMailService = {
+const mockMailService = () => ({
     sendVerificationEmail: jest.fn()
-}
+})
 
 describe("UserService", () => {
     let service: UserService
@@ -48,11 +49,11 @@ describe("UserService", () => {
             },
             {
                 provide: JwtService,
-                useValue: mockJwtService
+                useValue: mockJwtService()
             },
             {
                 provide: MailService,
-                useValue: mockMailService
+                useValue: mockMailService()
             }
 
         ],
@@ -182,6 +183,68 @@ describe("UserService", () => {
         });
     });
 
-    it.todo("editProfile")
+    describe('editProfile', () => {
+        it('should change email', async () => {
+            const oldUser = {
+                email: 'bs@old.com',
+                verified: true,
+            };
+            const editProfileArgs = {
+                userId: 1,
+                input: {email: 'bs@new.com'}
+            };
+            const newVerification = {
+                code: 'code'
+            }
+            const newUser ={
+                verified: false,
+                email: editProfileArgs.input.email
+            };
+
+            userRepository.findOne.mockResolvedValue(oldUser)
+            verificationRepository.create.mockResolvedValue(newVerification)
+            verificationRepository.save.mockResolvedValue(newVerification)
+
+            await service.editProfile(editProfileArgs.userId, editProfileArgs.input)
+
+            expect(userRepository.findOne).toHaveBeenCalledTimes(1)
+            expect(userRepository.findOne).toHaveBeenCalledWith(
+                editProfileArgs.userId
+            )
+
+            expect(verificationRepository.create).toHaveBeenCalledWith({
+                user: newUser
+            })
+            expect(verificationRepository.create).toHaveBeenCalledWith({
+                newVerification
+            })
+
+            expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
+                newUser.email,
+                newVerification.code
+            );
+
+            it('should change password', async () => {
+                const editprofile = {
+                    userId: 1,
+                    input: {password: 'new.password'},
+                };
+                userRepository.findOne.mockResolvedValue({password: 'old'})
+                const result = await service.editProfile(
+                    editProfileArgs.userId,
+                    editProfileArgs.input,
+                );
+                expect(userRepository.save).toHaveBeenCalledTimes(1)
+                expect(userRepository.save).toHaveBeenCalledWith(editProfileArgs.input)
+                expect(result).toEqual({ok: true})
+            });
+
+            it('shuold fail on exception', async () => {
+                userRepository.findOne.mockRejectedValue(new Error());
+                const result = await service.editProfile(1, {email: '12'});
+                expect(result).toEqual({ok:false, error: 'Could not update profile. '})
+            })
+        });
+    });
     it.todo("verfityEmail")
 })
