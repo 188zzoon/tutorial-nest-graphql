@@ -5,7 +5,9 @@ import { MailService } from "src/mail/mail.service";
 import { User } from "./entities/user.entity";
 import { Verification } from "./entities/verification.entity";
 import { UserService } from "./users.service";
+import { Repository } from "typeorm";
 
+type mockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>
 
 const mockRepository = {
     findOne: jest.fn(),
@@ -24,6 +26,8 @@ const mockMailService = {
 
 describe("UserService", () => {
     let service: UserService
+    let userRepository: mockRepository<User>
+    
 
     beforeAll(async () => {
         const module = await Test.createTestingModule({
@@ -49,15 +53,32 @@ describe("UserService", () => {
         ],
         }).compile()
         service =  module.get<UserService>(UserService)
+        userRepository = module.get(getRepositoryToken(User));
     });
-    
+
     it('should be defined', () => {
         expect(service).toBeDefined();
     })
 
-    it.todo("createAccount")
+    describe('createAccount', () => {
+        it('should fail if user exists', async () => {
+            userRepository.findOne.mockResolvedValue({
+                id: 1,
+                email: ''
+            })
+            const result = await service.createAccount({
+                email: '',
+                password: '',
+                role: 0,
+            });
+            expect(result).toMatchObject({
+                ok: false,
+                error: 'There is a user with that email already'
+            })
+        })
+    });
+
     it.todo("login")
     it.todo("editProfile")
     it.todo("verfityEmail")
-
 })
