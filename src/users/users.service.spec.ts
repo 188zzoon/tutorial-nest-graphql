@@ -1,23 +1,24 @@
 import { Test } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { exec } from 'child_process';
 import { JwtService } from "src/jwt/jwt.service";
 import { MailService } from "src/mail/mail.service";
 import { User } from "./entities/user.entity";
 import { Verification } from "./entities/verification.entity";
 import { UserService } from "./users.service";
 import { Repository } from "typeorm";
+import { UsersResolver } from "./users.resolver";
 
 type mockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>
 
 const mockRepository = () => ({
     findOne: jest.fn(),
     save: jest.fn(),
-    create: jest.fn()
+    create: jest.fn(),
+    findOneOrFail: jest.fn()
 });
 
 const mockJwtService = {
-    sign: jest.fn(),
+    sign: jest.fn(() => 'signed-token-babay'),
     verify: jest.fn(),
 }
 
@@ -30,9 +31,10 @@ describe("UserService", () => {
     let userRepository: mockRepository<User>
     let verificationRepository: mockRepository<Verification>
     let mailService: MailService
+    let jwtService: JwtService
     
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         const module = await Test.createTestingModule({
             providers: [
             UserService,
@@ -149,9 +151,37 @@ describe("UserService", () => {
                 error: 'User not found'
             })
         })
-    })
 
-    it.todo("login")
+        it('should fail if the password is wrong', async () => {
+
+            const mockUser = {
+                checkPassword: jest.fn(() => Promise.resolve(false)),
+            };
+            userRepository.findOne.mockResolvedValue(mockUser)
+            const result = await service.login(loginArgs)
+            expect(jwtService.sign).toHaveBeenCalledTimes(1)
+            expect(jwtService.sign).toHaveBeenCalledWith(expect.any(Number))
+            expect(result).toEqual({ok:true, token: 'signed-token-babay'})
+        });
+
+        it('should fail on exception', async () => {
+            userRepository.findOne.mockRejectedValue(new Error());
+            const result = await service.login(loginArgs)
+            expect(result).toEqual({ok:false, error: "can`t log user in."})
+        });
+    });
+
+    describe('findById', ()=> {
+        const findByIdArgs = {
+            id: 1,
+        };
+        it('should find an existing user', async () => {
+            userRepository.findOneOrFail.mockResolvedValue(findByIdArgs)
+            const result = await service.findById(1)
+            expect(result).toEqual({ok: true, user: findByIdArgs})
+        });
+    });
+
     it.todo("editProfile")
     it.todo("verfityEmail")
 })
