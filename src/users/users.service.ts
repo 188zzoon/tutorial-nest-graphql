@@ -136,7 +136,7 @@ export class UserService {
                 error: "Verification not found"
             }
         } catch (error) {
-            return {ok: false, error}           
+            return {ok: false, error: "Colud not verify email"}           
         }
     }
 }

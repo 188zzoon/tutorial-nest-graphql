@@ -15,7 +15,8 @@ const mockRepository = () => ({
     findOne: jest.fn(),
     save: jest.fn(),
     create: jest.fn(),
-    findOneOrFail: jest.fn()
+    findOneOrFail: jest.fn(),
+    delete: jest.fn()
 });
 
 const mockJwtService = () => ({
@@ -246,5 +247,31 @@ describe("UserService", () => {
             })
         });
     });
-    it.todo("verfityEmail")
-})
+    describe('verfityEmail', () => {
+        it('should verify email', async () => {
+            const mockedVerificaion = {
+                user: {
+                    verified: false,
+                },
+                id:1
+            };
+            verificationRepository.findOne.mockResolvedValue(mockedVerificaion);
+
+            const result = await service.verifyEmail('')
+            expect(verificationRepository.findOne).toHaveBeenCalledTimes(1)
+            expect(verificationRepository.findOne).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object)
+            );
+            expect(userRepository.save).toHaveBeenCalledTimes(1)
+            expect(userRepository.save).toHaveBeenCalledWith({verified:true})
+            expect(result).toEqual({ok:true});
+        });
+
+    it('should fail on exception', async () => {
+        verificationRepository.findOne.mockRejectedValue(new Error());
+        const result = await service.verifyEmail('');
+        expect(result).toEqual({ok:false, error:"Colud not verify Email"})
+        });
+    });
+});
