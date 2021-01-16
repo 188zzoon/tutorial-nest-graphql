@@ -39,7 +39,7 @@ export class Restaurant extends CoreEntity {
   @Field(type => User)
   @ManyToOne(
     type => User,
-    user => user.restaurants
+    user => user.restaurants,
   )
   owner: User
 }

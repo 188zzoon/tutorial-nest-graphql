@@ -11,11 +11,11 @@ import { InternalServerErrorException } from "@nestjs/common";
 import { IsBoolean ,IsEmail, IsEnum, IsString } from 'class-validator';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
   
-  enum UserRole {
-    Client,
-    Owner,
-    Delivery,
-  }
+export enum UserRole {
+  Client = 'CLIENT',
+  Owner = "OWNER",
+  Delivery = "DELIVERY",
+}
   
 registerEnumType(UserRole, { name: 'UserRole' });
 
@@ -49,8 +49,7 @@ export class User extends CoreEntity {
       type => Restaurant,
       restaurant => restaurant.owner,
     )
-    restaurants: Restaurant[]
-
+    restaurants: Restaurant[];
 
   
     @BeforeInsert()

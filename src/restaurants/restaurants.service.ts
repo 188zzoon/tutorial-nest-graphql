@@ -25,7 +25,6 @@ export class RestaurantsService {
         createRestaurantInput: CreateRestaurantInput,
     ) : Promise<CreateRestaurantOutput> {
         try {
-            console.log("TEST CREATE RESTURANTS")
             
             // Problem Code - CAPITAL 'C'
             // const newRestaurant = await this.restaurants.create(CreateRestaurantInput)
