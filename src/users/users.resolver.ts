@@ -1,5 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Console } from 'console';
+import { any } from 'joi';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import {
@@ -36,10 +38,10 @@ export class UsersResolver {
 
   @Query(returns => User)
   @UseGuards(AuthGuard)
-  me(@AuthUser() authUser : User ){
-    console.log(authUser)
-    return authUser
+  me(@AuthUser() authUser: User): User {
+    return authUser;
   }
+
 
   @UseGuards(AuthGuard)
   @Query(returns => UserProfileOuptut)

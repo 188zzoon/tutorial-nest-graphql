@@ -2,6 +2,7 @@ import { Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "src/users/users.service";
 import { JwtService } from "src/jwt/jwt.service";
+import { User } from "src/users/entities/user.entity";
 
 // export function  jwtMiddleware(req: Request, res: Response, next: NextFunction) {
 //     console.log(req.headers)
@@ -17,11 +18,11 @@ export class JwtMiddleware implements NestMiddleware {
 
     async use(req: Request, res: Response, next: NextFunction)
     {
-        // console.log("Test: Class MiddleWare")
         if ('x-jwt' in req.headers) {
             const token = req.headers['x-jwt']
             try {
                 const decoded = this.jwtService.verity(token.toString())
+                console.log(decoded)
                 if (typeof decoded == 'object' && decoded.hasOwnProperty('id')) {
                         const user = await this.userService.findById(decoded['id'])
                         req['user'] = user
