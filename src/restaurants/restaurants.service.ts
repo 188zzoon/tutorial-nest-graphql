@@ -25,16 +25,26 @@ export class RestaurantsService {
         createRestaurantInput: CreateRestaurantInput,
     ) : Promise<CreateRestaurantOutput> {
         try {
-            const newRestaurant = this.restaurants.create(CreateRestaurantInput)
+            console.log("TEST CREATE RESTURANTS")
+            
+            // Problem Code - CAPITAL 'C'
+            // const newRestaurant = await this.restaurants.create(CreateRestaurantInput)
+            
+            // Fix Code
+            const newRestaurant = await this.restaurants.create(createRestaurantInput)
             newRestaurant.owner = owner;
+
+  
             const categoryName = createRestaurantInput.categoryName.trim().toLowerCase()
             const categorySlug = categoryName.replace(/ /g, '-');
+
             let category = await this.categories.findOne({slug: categorySlug})
             if(!category){
                 category = await this.categories.save(
                     this.categories.create({slug: categorySlug, name:categoryName})
-                );
+                )
             }
+            // ORG CODE
             newRestaurant.category = category
             await this.restaurants.save(newRestaurant)
             return {
@@ -43,7 +53,7 @@ export class RestaurantsService {
         } catch{
             return {
                 ok: false,
-            error: 'Could nto create restaurant'
+                error: "Could not create restaurant"
             }
         }
     }
