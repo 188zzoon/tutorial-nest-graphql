@@ -7,6 +7,7 @@ import { EditRestaurantInput, EditRestaurantOutput } from "./dtos/edit-restauran
 import { Restaurant } from "./entities/restaurant.entity";
 import { RestaurantsService } from "./restaurants.service";
 
+
 @Resolver(of => Restaurant)
 export class RestaurantsResolver {
     constructor(private readonly restaurantsService: RestaurantsService) {}
