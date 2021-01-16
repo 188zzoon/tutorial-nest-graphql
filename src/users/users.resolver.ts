@@ -4,6 +4,7 @@ import { Console } from 'console';
 import { any } from 'joi';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Role } from 'src/auth/role.decorator';
 import {
   CreateAccountInput,
   CreateAccountOutput,
@@ -37,14 +38,14 @@ export class UsersResolver {
   }
 
   @Query(returns => User)
-  @UseGuards(AuthGuard)
+  @Role(['Any'])
   me(@AuthUser() authUser: User): User {
     return authUser;
   }
 
 
-  @UseGuards(AuthGuard)
   @Query(returns => UserProfileOuptut)
+  @Role(['Any'])
   async userProfile(
     @Args() userProfileInput: UserProfileInput
   ) : Promise<UserProfileOuptut> {
@@ -52,7 +53,7 @@ export class UsersResolver {
   }
 
   @Mutation(returns => EditProfileOutput)
-  @UseGuards(AuthGuard)
+  @Role(['Any'])
   async editProfile(
     @AuthUser() authUser: User,
     @Args('input') editProfileInput: EditProfileInput
