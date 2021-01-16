@@ -1,4 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { promises } from 'fs';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from "src/auth/role.decorator";
 import { User, UserRole} from 'src/users/entities/user.entity';
@@ -23,15 +24,14 @@ export class RestaurantsResolver {
             createRestaurantInput
         )
     }
-
     
     @Mutation(returns => EditRestaurantOutput)
     @Role(['Owner'])
     editRestaurant(
-        @AuthUser() authUser: User,
+        @AuthUser() owner: User,
         @Args('input') editRestaurantInput: EditRestaurantInput,
-    ): EditRestaurantOutput {
-        return { ok: true}
+    ): Promise<EditRestaurantOutput> {
+        return this.restaurantsService.editRestaurant(owner, editRestaurantInput)
     }
 
 }
