@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from "typeorm";
 import { User } from "src/users/entities/user.entity";
-import {
-    CreateRestaurantInput,
-    CreateRestaurantOutput
-} from './dtos/create-restaurant.dto'
-
+import { CreateRestaurantInput,CreateRestaurantOutput} from './dtos/create-restaurant.dto'
 import { EditRestaurantInput, EditRestaurantOutput } from "./dtos/edit-restaurant.dto.ts";
+import { DeleteRestaurantInput,DeleteRestaurantOutput } from "./dtos/delete-restaurant.dto";
+
 
 import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { InjectRepository } from '@nestjs/typeorm';
@@ -115,5 +113,42 @@ export class RestaurantsService {
             }
           }
       }
+
+      
+    async deleteRestaurant(
+        owner: User,
+        { restaurantId } : DeleteRestaurantInput 
+    ): Promise<DeleteRestaurantOutput>{
+        try {
+            console.log(`ID : ${restaurantId}`)
+            const restaurant = await this.restaurants.findOne(restaurantId);
+
+            console.log(owner['user'])
+
+            console.log(`${owner.id} / ${restaurant.owerId}`)
+            if(!restaurant) {
+                return {
+                    ok: false,
+                    error: "Restaurant not found"
+                };
+            }
+            if(owner.id !== restaurant.owerId) {
+                return {
+                    ok: false,
+                    error: "You can't delete a restaurant that you don't own"
+                }
+            };
+        await this.restaurants.delete(restaurantId)
+        return {
+            ok: true
+            
+        }
+        } catch{
+            return{
+            ok: false,
+            error: 'Colud not delete restaurant.'
+        }
+        }
+    }
 }
 
