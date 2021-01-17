@@ -10,6 +10,7 @@ import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { CategoryRepository } from './repositories/category.repository';
+import { AllCategoriesOutput } from './dtos/all-categories.dto';
 
 
 @Injectable()
@@ -150,5 +151,20 @@ export class RestaurantsService {
         }
         }
     }
+
+    async allCategories(): Promise<AllCategoriesOutput> {
+        try {
+          const categories = await this.categories.find();
+          return {
+            ok: true,
+            categories,
+          };
+        } catch {
+          return {
+            ok: false,
+            error: 'Could not load categories',
+          };
+        }
+      }
 }
 
