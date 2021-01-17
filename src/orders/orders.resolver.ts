@@ -1,0 +1,21 @@
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { CreateDishInput, CreateDishOutput } from 'src/restaurants/dtos/create-dish.dto';
+import { User } from 'src/users/entities/user.entity';
+import { Order } from './entities/order.entity';
+import { OrdersService } from "./orders.service";
+
+@Resolver(of => Order)
+export class OrdersResolver {
+    constructor(private readonly ordersService: OrdersService) {}
+
+    async createOrder(
+        @AuthUser() customer: User,
+        @Args('input')
+        createDishInput: CreateDishInput,
+    ) : Promise<CreateDishOutput> {
+        return {
+            ok: true
+        }
+    }
+}
