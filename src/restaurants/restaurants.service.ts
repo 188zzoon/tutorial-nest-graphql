@@ -1,19 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { Like, Raw, Repository } from "typeorm";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Category } from './entities/category.entity';
 import { User } from "src/users/entities/user.entity";
+import { Like, Raw, Repository } from "typeorm";
 import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { CreateRestaurantInput,CreateRestaurantOutput} from './dtos/create-restaurant.dto'
 import { EditRestaurantInput, EditRestaurantOutput } from "./dtos/edit-restaurant.dto.ts";
 import { DeleteRestaurantInput,DeleteRestaurantOutput } from "./dtos/delete-restaurant.dto";
 
-import { InjectRepository } from '@nestjs/typeorm';
 import { RestaurantsInput, RestaurantsOutput } from "./dtos/restaurants.dto";
 import { RestaurantInput, RestaurantOutput } from "./dtos/restaurant.dto";
 import { SearchRestaurantInput, SearchRestaurantOutput } from "./dtos/search-restaurant.dto";
-import { Category } from './entities/category.entity';
 import { CategoryRepository } from './repositories/category.repository';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
+import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
 
 
 @Injectable()
@@ -232,7 +233,10 @@ export class RestaurantsService {
     async findRestaurantById(
         {restaurantId} : RestaurantInput) : Promise<RestaurantOutput> {
             try {
-                const restaurant = await this.restaurants.findOne(restaurantId)
+                const restaurant = await this.restaurants.findOne(restaurantId, 
+                    {
+                        relations: ['menu']
+                    })
                 if(!restaurant){
                     return {
                         ok: false,
@@ -274,6 +278,15 @@ export class RestaurantsService {
                 ok: false,
                 error: 'Cloud not search for restaurants'
             };
+        }
+    }
+
+    async createDish(
+        owner: User,
+        createDishInput: CreateDishInput
+    ) : Promise<CreateDishOutput> {
+        return {
+            ok: false
         }
     }
 }
