@@ -13,9 +13,9 @@ export class OrdersResolver {
     async createOrder(
         @AuthUser() customer: User,
         @Args('input')
-        createDishInput: CreateDishInput,
+        createOrderInput: CreateOrderInput,
     ) : Promise<CreateDishOutput> {
-        return this.ordersService.createOrder(customer, CreateOrderInput)
+        return this.ordersService.createOrder(customer, createOrderInput)
     }
 
 }
