@@ -15,6 +15,8 @@ import { CategoryRepository } from './repositories/category.repository';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
 import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
+import { Role } from 'src/auth/role.decorator';
+import { Dish } from './entities/dish.entity';
 
 
 @Injectable()
@@ -23,8 +25,12 @@ export class RestaurantsService {
     constructor(
         @InjectRepository(Restaurant)
         private readonly restaurants: Repository<Restaurant>,
+        @InjectRepository(Dish)
+        private readonly dishs: Repository<Dish>,
+        
         @InjectRepository(Category)
-        private readonly categories: CategoryRepository
+        private readonly categories: CategoryRepository,
+
     ) {}
 
     async getOrCreate(name: string) : Promise<Category> {
@@ -285,8 +291,35 @@ export class RestaurantsService {
         owner: User,
         createDishInput: CreateDishInput
     ) : Promise<CreateDishOutput> {
-        return {
-            ok: false
+
+        try {
+            const restaurant = await this.restaurants.findOne(
+                createDishInput.restaurantId,
+            );
+            if(!restaurant) {
+                return {
+                    ok: false,
+                    error: "Restaurant not found"
+                };
+            }
+            if (owner.id !== restaurant.owerId) {
+                return {
+                    ok: false,
+                    error: "You Can't do that"
+                };
+            }
+            await this.dishs.save(
+                this.dishs.create({...createDishInput, restaurant})
+            )
+            return {
+                ok: true
+            };
+        } catch(error){
+            console.log(error)
+            return {
+                ok: false,
+                error: 'Cloud not create dish'
+            }
         }
     }
 }
