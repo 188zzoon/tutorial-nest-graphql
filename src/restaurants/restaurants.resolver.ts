@@ -10,6 +10,7 @@ import { Restaurant } from "./entities/restaurant.entity";
 import { RestaurantsService } from "./restaurants.service";
 import { Category } from './entities/category.entity';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
+import { CategoryInput, CategoryOutput } from './dtos/category.dto';
 
 
 @Resolver(of => Restaurant)
@@ -66,4 +67,9 @@ export class CategoryResolver {
     countRestaurants(category: Category) {
         return this.restaurantService.countRestaurants(category);
       }
+
+    @Query(type => CategoryOutput)
+    category(@Args() categoryInput: CategoryInput) : Promise<CategoryOutput> {
+        return this.restaurantService.findCategoryBySlug(categoryInput)
+    }
 }
