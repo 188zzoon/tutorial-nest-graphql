@@ -2,7 +2,7 @@ import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nes
 import { promises } from 'fs';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from "src/auth/role.decorator";
-import { User, UserRole} from 'src/users/entities/user.entity';
+import { User} from 'src/users/entities/user.entity';
 import { CreateRestaurantInput, CreateRestaurantOutput } from "./dtos/create-restaurant.dto";
 import { EditRestaurantInput, EditRestaurantOutput } from "./dtos/edit-restaurant.dto.ts";
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from "./dtos/delete-restaurant.dto";
@@ -11,6 +11,8 @@ import { RestaurantsService } from "./restaurants.service";
 import { Category } from './entities/category.entity';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
+import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
+import { SearchRestaurantInput, SearchRestaurantOutput } from './dtos/search-restaurant.dto';
 
 
 @Resolver(of => Restaurant)
@@ -71,5 +73,19 @@ export class CategoryResolver {
     @Query(type => CategoryOutput)
     category(@Args("input") categoryInput: CategoryInput) : Promise<CategoryOutput> {
         return this.restaurantService.findCategoryBySlug(categoryInput)
+    }
+
+    @Query(returns => RestaurantOutput)
+    restaurant (
+        @Args('input') RestaurantInput: RestaurantInput
+    ): Promise<RestaurantOutput> {
+        return this.restaurantService.findRestaurantById(RestaurantInput)
+    }
+
+    @Query(returns => SearchRestaurantOutput)
+    searchRestaurant(
+        @Args('input') SearchRestaurantInput: SearchRestaurantInput
+    ) : Promise<SearchRestaurantOutput> {
+        return this.restaurantService.searchRestaurantByName(SearchRestaurantInput)
     }
 }

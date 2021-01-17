@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 import { User } from "src/users/entities/user.entity";
 import { CreateRestaurantInput,CreateRestaurantOutput} from './dtos/create-restaurant.dto'
 import { EditRestaurantInput, EditRestaurantOutput } from "./dtos/edit-restaurant.dto.ts";
@@ -9,6 +9,7 @@ import { DeleteRestaurantInput,DeleteRestaurantOutput } from "./dtos/delete-rest
 import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { InjectRepository } from '@nestjs/typeorm';
 import { RestaurantInput, RestaurantOutput } from "./dtos/restaurants.dto";
+import { SearchRestaurantInput, SearchRestaurantOutput } from "./dtos/search-restaurant.dto";
 import { Category } from './entities/category.entity';
 import { CategoryRepository } from './repositories/category.repository';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
@@ -227,6 +228,43 @@ export class RestaurantsService {
             
         }        
     }
+
+    async findRestaurantById(
+        {restaurantId} : RestaurantInput) : Promise<RestaurantOutput> {
+            try {
+                const restaurant = await this.restaurants.findOne(restaurantId)
+                if(!restaurant){
+                    return {
+                        ok: false,
+                        error: `Restaurant not found`
+                    };
+                }
+                return {
+                    ok: true,
+                    error: `Colud not find restaurant`
+                };
+            } catch{
+                return {
+                ok: false,
+                error: 'Cloud not find restaurant'
+            }
+        }
+    }
+
+    async searchRestaurantByName({
+        query, page
+    }:SearchRestaurantInput) : Promise<SearchRestaurantOutput> {
+        try {
+            const [restaurants, totalResults] = await this.restaurants.findAndCount({
+                where: {
+                    name: Like(`%${query}$`)
+                }
+            })
+        } catch{
+            return {
+                ok: false,
+                error: 'Cloud not search for restaurants'
+            };
+        }
+    }
 }
-
-
