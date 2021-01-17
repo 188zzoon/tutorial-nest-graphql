@@ -8,6 +8,7 @@ import { DeleteRestaurantInput,DeleteRestaurantOutput } from "./dtos/delete-rest
 
 import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { InjectRepository } from '@nestjs/typeorm';
+import { RestaurantInput, RestaurantOutput } from "./dtos/restaurants.dto";
 import { Category } from './entities/category.entity';
 import { CategoryRepository } from './repositories/category.repository';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
@@ -193,6 +194,7 @@ export class RestaurantsService {
             const totalResults = await this.countRestaurants(category)
             return {
                 ok:true,
+                restaurants,
                 category,
                 totalPages: Math.ceil(totalResults/25)
             }
@@ -202,6 +204,28 @@ export class RestaurantsService {
                error: 'Could not load category'
             }
         }
+    }
+
+    
+    async allRestaurants({page}: RestaurantInput) : Promise<RestaurantOutput> {
+        try {
+            const [restaurant, totalResults] = await this.restaurants.findAndCount({
+                skip: (page-1) * 25,
+                take: 25
+        });
+        return {
+            ok: true,
+            results: restaurant,
+            totalPages: Math.ceil(totalResults/25),
+            totalResults
+        }
+        } catch {
+            return {
+                ok: false,
+                error: 'Could not load restaurants'
+            }
+            
+        }        
     }
 }
 
