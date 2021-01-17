@@ -2,6 +2,7 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { CreateDishInput, CreateDishOutput } from 'src/restaurants/dtos/create-dish.dto';
 import { User } from 'src/users/entities/user.entity';
+import { CreateOrderInput } from './dtos/create-order.dto';
 import { Order } from './entities/order.entity';
 import { OrdersService } from "./orders.service";
 
@@ -14,8 +15,7 @@ export class OrdersResolver {
         @Args('input')
         createDishInput: CreateDishInput,
     ) : Promise<CreateDishOutput> {
-        return {
-            ok: true
-        }
+        return this.ordersService.createOrder(customer, CreateOrderInput)
     }
+
 }
