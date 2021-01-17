@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Like, Repository } from "typeorm";
+import { Like, Raw, Repository } from "typeorm";
 import { User } from "src/users/entities/user.entity";
+import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { CreateRestaurantInput,CreateRestaurantOutput} from './dtos/create-restaurant.dto'
 import { EditRestaurantInput, EditRestaurantOutput } from "./dtos/edit-restaurant.dto.ts";
 import { DeleteRestaurantInput,DeleteRestaurantOutput } from "./dtos/delete-restaurant.dto";
 
-
-import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { InjectRepository } from '@nestjs/typeorm';
-import { RestaurantInput, RestaurantOutput } from "./dtos/restaurants.dto";
+import { RestaurantsInput, RestaurantsOutput } from "./dtos/restaurants.dto";
+import { RestaurantInput, RestaurantOutput } from "./dtos/restaurant.dto";
 import { SearchRestaurantInput, SearchRestaurantOutput } from "./dtos/search-restaurant.dto";
 import { Category } from './entities/category.entity';
 import { CategoryRepository } from './repositories/category.repository';
@@ -208,7 +208,7 @@ export class RestaurantsService {
     }
 
     
-    async allRestaurants({page}: RestaurantInput) : Promise<RestaurantOutput> {
+    async allRestaurants({page}: RestaurantsInput) : Promise<RestaurantsOutput> {
         try {
             const [restaurant, totalResults] = await this.restaurants.findAndCount({
                 skip: (page-1) * 25,
@@ -257,9 +257,18 @@ export class RestaurantsService {
         try {
             const [restaurants, totalResults] = await this.restaurants.findAndCount({
                 where: {
-                    name: Like(`%${query}$`)
+                    // name: Like(`%${query}$`)\
+                    name: Raw(name => `${name} ILIKE '%${query}'`),
+                    skip: (page-1)*25,
+                    take: 25
                 }
             })
+            return {
+                ok: true,
+                restaurants,
+                totalResults,
+                totalPages: Math.ceil(totalResults/25)
+            }
         } catch{
             return {
                 ok: false,
