@@ -6,6 +6,7 @@ import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 import { Restaurant } from './restaurant.entity';
 
 
+@InputType('DishChoiceInputType', { isAbstract: true })
 @ObjectType()
 class DishOption {
   

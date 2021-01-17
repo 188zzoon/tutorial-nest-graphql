@@ -15,7 +15,6 @@ import { CategoryRepository } from './repositories/category.repository';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
 import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
-import { Role } from 'src/auth/role.decorator';
 import { Dish } from './entities/dish.entity';
 
 
@@ -296,12 +295,17 @@ export class RestaurantsService {
             const restaurant = await this.restaurants.findOne(
                 createDishInput.restaurantId,
             );
+
             if(!restaurant) {
                 return {
                     ok: false,
                     error: "Restaurant not found"
                 };
             }
+
+            console.log(restaurant)
+            console.log(`restaurant.owerId : ${restaurant.owerId}`)
+            console.log(`owner.id : ${owner.id}`)
             if (owner.id !== restaurant.owerId) {
                 return {
                     ok: false,
