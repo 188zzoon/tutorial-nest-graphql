@@ -166,5 +166,9 @@ export class RestaurantsService {
           };
         }
       }
+      
+    countRestaurants(category: Category) {
+        return this.restaurants.count({category})
+    }
 }
 

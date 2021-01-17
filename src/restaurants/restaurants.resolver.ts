@@ -1,4 +1,4 @@
-import { Args, Int, Mutation, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { promises } from 'fs';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from "src/auth/role.decorator";
@@ -54,13 +54,16 @@ export class CategoryResolver {
                                 
     
     @ResolveField(type => Int)
-    restaurantCount(): number {
-        return 80
+    restaurantCount(@Parent() category: Category): Promise<number> {
+        return this.restaurantService.countRestaurants(category)
     }
 
     @Query(type => AllCategoriesOutput)
     allCategories(): Promise<AllCategoriesOutput> {
         return this.restaurantService.allCategories();
     }
-    
+
+    countRestaurants(category: Category) {
+        return this.restaurantService.countRestaurants(category);
+      }
 }
