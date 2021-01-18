@@ -9,7 +9,7 @@ class CreateOrderItemInput {
     @Field(type => Int)
     dishId: number
 
-    @Field(type => [], {nullable: true})
+    @Field(type => [OrderItemOption], {nullable: true})
     options?: OrderItemOption[]
 }
 
