@@ -19,9 +19,6 @@ import { Dish } from './entities/dish.entity';
 import { EditProfileInput } from 'src/users/dtos/edit-profile.dto';
 import { EditDishInput, EditDishOutput } from './dtos/edit-dish.dto';
 import { DeleteDishInput, DeleteDishOutput } from './dtos/delete-dish.dto';
-import { AuthUser } from 'src/auth/auth-user.decorator';
-import { Mutation } from '@nestjs/graphql';
-import { Role } from 'src/auth/role.decorator';
 
 
 @Injectable()
@@ -96,7 +93,7 @@ export class RestaurantsService {
                 }
               }
 
-              if(owner.id !== restaurant.owerId) {
+              if(owner.id !== restaurant.ownerId) {
                   return {
                       ok: false,
                       error: "You can't edit a restaurant that you don't own"
@@ -141,14 +138,14 @@ export class RestaurantsService {
 
             console.log(owner['user'])
 
-            console.log(`${owner.id} / ${restaurant.owerId}`)
+            console.log(`${owner.id} / ${restaurant.ownerId}`)
             if(!restaurant) {
                 return {
                     ok: false,
                     error: "Restaurant not found"
                 };
             }
-            if(owner.id !== restaurant.owerId) {
+            if(owner.id !== restaurant.ownerId) {
                 return {
                     ok: false,
                     error: "You can't delete a restaurant that you don't own"
@@ -310,9 +307,9 @@ export class RestaurantsService {
             }
 
             console.log(restaurant)
-            console.log(`restaurant.owerId : ${restaurant.owerId}`)
+            console.log(`restaurant.owerId : ${restaurant.ownerId}`)
             console.log(`owner.id : ${owner.id}`)
-            if (owner.id !== restaurant.owerId) {
+            if (owner.id !== restaurant.ownerId) {
                 return {
                     ok: false,
                     error: "You Can't do that"
@@ -346,7 +343,7 @@ export class RestaurantsService {
                     error: 'Dish not found'
                 }
             }
-            if (dish.restaurant.owerId !== owner.id) {
+            if (dish.restaurant.ownerId !== owner.id) {
                 return {
                     ok: false,
                     error: "You can't do that."
@@ -383,7 +380,7 @@ export class RestaurantsService {
                     error: 'Dish not found'
                 };
             }
-            if (dish.restaurant.owerId !== owner.id) {
+            if (dish.restaurant.ownerId !== owner.id) {
                 return {
                     ok: false,
                     error: "You can't do that"

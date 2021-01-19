@@ -18,7 +18,7 @@ export class DishChoice {
 }
 
 
-@InputType('DishChoiceInputType', { isAbstract: true })
+@InputType('DishOptionInputType', { isAbstract: true })
 @ObjectType()
 export class DishOption {
   

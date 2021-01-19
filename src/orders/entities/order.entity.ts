@@ -3,7 +3,7 @@ import { IsEnum } from "class-validator";
 import { CoreEntity } from "src/common/entities/core.entity";
 import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, RelationId } from "typeorm";
 import { OrderItem } from "./order-item.entity";
 
 
@@ -31,6 +31,9 @@ export class Order extends CoreEntity {
     )
     customer?: User
 
+    @RelationId((order: Order) => order.customer)
+    customerId: number
+
     @Field(type => User, {nullable: true})
     @ManyToOne(
         type => User,
@@ -39,7 +42,10 @@ export class Order extends CoreEntity {
     )
     driver?: User
 
-    @Field(type => Restaurant)
+    @RelationId((order: Order) => order.driver)
+    driverId: number
+
+    @Field(type => Restaurant, { nullable: true })
     @ManyToOne(
         type => Restaurant,
         restaurant => restaurant.orders,
