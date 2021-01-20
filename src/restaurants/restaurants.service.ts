@@ -198,6 +198,9 @@ export class RestaurantsService {
                     category
                 },
                 take: 25,
+                order:{
+                    isPromoted: 'DESC'
+                },
                 skip:(page - 1) * 25
             });
             category.restaurants = restaurants
