@@ -6,7 +6,7 @@ import {
  } from '@nestjs/common';
 import * as Joi from 'joi';
 import { ConfigModule } from '@nestjs/config';
-import { GraphQLModule } from '@nestjs/graphql';
+import { Context, GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './users/users.module';
 import { User } from "./users/entities/user.entity";
@@ -59,8 +59,12 @@ import { OrderItem } from './orders/entities/order-item.entity';
       entities: [User,Verification, Restaurant, Category, Dish, Order, OrderItem],
     }),
     GraphQLModule.forRoot({
+      installSubscriptionHandlers: true,
       autoSchemaFile: true,
-      context: ({req}) => ({user: req['user']})
+      context: ({req}) => {
+        console.log(req['user'])
+        return { user: req['user'] };
+      }
     }),
     JwtModule.forRoot({
       privateKey : process.env.PRIVATE_KEY
