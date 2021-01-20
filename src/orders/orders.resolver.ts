@@ -1,8 +1,11 @@
+import { Inject } from "@nestjs/common";
 import { Args, Mutation, Resolver, Query, Subscription } from '@nestjs/graphql';
 import { ARRAY_CONTAINS } from 'class-validator';
 import { PubSub } from 'graphql-subscriptions';
+import { userInfo } from 'os';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
+import { PUB_SUB } from "src/common/common.constants";
 import { CreateDishInput, CreateDishOutput } from 'src/restaurants/dtos/create-dish.dto';
 import { EditDishOutput } from 'src/restaurants/dtos/edit-dish.dto';
 import { User } from 'src/users/entities/user.entity';
@@ -13,12 +16,12 @@ import { GetOrdersInput, GetOrdersOutput } from './dtos/get-orders.dto';
 import { Order } from './entities/order.entity';
 import { OrderService } from "./orders.service";
 
-
-const pubsub = new PubSub()
-
 @Resolver(of => Order)
 export class OrdersResolver {
-    constructor(private readonly orderService: OrderService) {}
+    constructor(
+        private readonly orderService: OrderService
+        @Inject(PUB_SUB) private readonly pubsub: PubSub
+        ) {}
 
     async createOrder(
         @AuthUser() customer: User,
@@ -55,8 +58,17 @@ export class OrdersResolver {
         return this.orderService.editOrder(user, editOrderInput)
     }
 
+    @Mutation(returns => Boolean)
+    potatoReady(){
+        this.pubsub.publish('hostPotatos', {
+            readyPotato: "Your potato is ready. love you"
+            })
+        return true
+    };
+
     @Subscription(returns => String)
-    hostPotatos() {
-        return pubsub.asyncIterator('hostPotatos')
+    @Role(['Any'])
+    readyPotato(@AuthUser() user: User) {
+        return this.pubsub.asyncIterator('hostPotatos')
     }
 }
