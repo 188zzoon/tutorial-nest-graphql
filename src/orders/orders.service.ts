@@ -1,8 +1,6 @@
-import { Injectable, Query } from '@nestjs/common';
-import { Args } from '@nestjs/graphql';
+import { Inject, Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuthUser } from 'src/auth/auth-user.decorator';
-import { Role } from 'src/auth/role.decorator';
+import { PubSub } from 'graphql-subscriptions';
 import { Dish } from 'src/restaurants/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User, UserRole } from 'src/users/entities/user.entity';
@@ -13,6 +11,11 @@ import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 import { GetOrdersInput, GetOrdersOutput} from './dtos/get-orders.dto';
 import { OrderItem } from './entities/order-item.entity';
 import { Order, OrderStatus } from './entities/order.entity';
+import { 
+  NEW_COOKED_ORDER,
+  NEW_PENDING_ORDER,
+  PUB_SUB,
+ } from "src/common/common.constants";
 
 @Injectable()
 export class OrderService {
@@ -25,6 +28,7 @@ export class OrderService {
     private readonly restaurants: Repository<Restaurant>,
     @InjectRepository(Dish)
     private readonly dishes: Repository<Dish>,
+    @Inject(PUB_SUB) private readonly pubsub: PubSub
   ) {}
 
   async crateOrder(
@@ -78,7 +82,7 @@ export class OrderService {
         );
         orderItems.push(orderItem);
       }
-      await this.orders.save(
+      const order = await this.orders.save(
         this.orders.create({
           customer,
           restaurant,
@@ -86,6 +90,9 @@ export class OrderService {
           items: orderItems,
         }),
       );
+      await this.pubsub.publish(NEW_PENDING_ORDER, {
+        pendingOrders: {order, ownerId: restaurant.ownerId}
+      });
       return {
         ok: true,
       };
@@ -241,6 +248,13 @@ export class OrderService {
           status
         },
       ]);
+      if (user.role === UserRole.Owner) {
+        if (status === OrderStatus.Cooked) {
+          await this.pubsub.publish(NEW_PENDING_ORDER, {
+            cookedOrders(: {...order, status})
+          })
+        }
+      }
       return {
         ok: true
       }
