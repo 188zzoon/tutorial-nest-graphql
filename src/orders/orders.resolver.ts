@@ -9,10 +9,12 @@ import { CreateOrderInput } from './dtos/create-order.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 import { GetOrdersInput, GetOrdersOutput } from './dtos/get-orders.dto';
+import { OrderUpdateInput } from "./dtos/order-updates.dto";
 import { Order } from './entities/order.entity';
 import { OrderService } from "./orders.service";
 import { 
     NEW_COOKED_ORDER,
+    NEW_ORDER_UPDATE,
     NEW_PENDING_ORDER,
     PUB_SUB,
  } from "src/common/common.constants";
@@ -75,5 +77,11 @@ export class OrdersResolver {
     @Role(['Delivery'])
     cookedOrders() {
         return this.pubsub.asyncIterator(NEW_COOKED_ORDER)
+    }
+
+    @Subscription(returns => Order)
+    @Role(['Any'])
+    orderUpdates(@Args('input') orderUpdateInput: OrderUpdateInput) {
+        return this.pubsub.asyncIterator(NEW_ORDER_UPDATE)
     }
 }

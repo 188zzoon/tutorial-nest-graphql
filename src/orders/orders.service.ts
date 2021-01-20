@@ -14,6 +14,7 @@ import { Order, OrderStatus } from './entities/order.entity';
 import { 
   NEW_COOKED_ORDER,
   NEW_PENDING_ORDER,
+  NEW_ORDER_UPDATE
   PUB_SUB,
  } from "src/common/common.constants";
 
@@ -201,9 +202,7 @@ export class OrderService {
     {id: orderId, status} : EditOrderInput,
   ) : Promise<EditOrderOutput> {
     try {
-      const order = await this.orders.findOne(orderId, {
-        relations: ['restaurant'],
-      });
+      const order =await this.orders.findOne(orderId)
       if(!order) {
         return {
           ok: false,
@@ -248,13 +247,15 @@ export class OrderService {
           status
         },
       ]);
+      const newOrder = {...order, status}
       if (user.role === UserRole.Owner) {
         if (status === OrderStatus.Cooked) {
           await this.pubsub.publish(NEW_PENDING_ORDER, {
-            cookedOrders(: {...order, status})
+            cookedOrders: newOrder
           })
         }
       }
+      await this.pubsub.publish(NEW_ORDER_UPDATE, {orderUpdates: newOrder})
       return {
         ok: true
       }
