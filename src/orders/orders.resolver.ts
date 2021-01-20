@@ -18,12 +18,13 @@ import {
     NEW_PENDING_ORDER,
     PUB_SUB,
  } from "src/common/common.constants";
+import { TakeOrderInput, TakeOrderOutput } from "./dtos/take-order.dto";
 
 
 @Resolver(of => Order)
 export class OrdersResolver {
     constructor(
-        private readonly orderService: OrderService
+        private readonly orderService: OrderService,
         @Inject(PUB_SUB) private readonly pubsub: PubSub
         ) {}
 
@@ -98,5 +99,14 @@ export class OrdersResolver {
     @Role(['Any'])
     orderUpdates(@Args('input') orderUpdateInput: OrderUpdateInput) {
         return this.pubsub.asyncIterator(NEW_ORDER_UPDATE)
+    }
+
+    @Mutation(returns => TakeOrderOutput)
+    @Role(['Delivery'])
+    takeOrder(
+        @AuthUser() driver: User,
+        @Args('input') TakeOrderInput: TakeOrderInput,
+    ): Promise<TakeOrderOutput>{
+        return this.orderService.takeOrder(driver, TakeOrderInput);
     }
 }
